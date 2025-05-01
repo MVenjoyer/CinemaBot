@@ -138,15 +138,15 @@ async def __create_inline_keyboard(links: dict) -> InlineKeyboardMarkup:
 
 async def __find_link(film: dict[tp.Any], resource: str) -> str:
     try:
-        url = "https://www.google.com/search"
+        url = "https://www.bing.com/search"
         params = {"q": f"{film['name']} {film['year']} {resource}"}
         async with aiohttp.ClientSession() as session:
             async with session.get(url, params=params, headers=USER_HEADERS) as response:
                 if response.status == 200:
                     html_content = await response.text()
                     soup = BeautifulSoup(html_content, "html.parser")
-                    for lnk in soup.select(".tF2Cxc .yuRUbf a", limit=5):
-                        link = lnk["href"]
+                    for lnk in soup.select("li.b_algo", limit=5):
+                        link = lnk.find("h2").find("a")["href"]
                         if resource.lower() in link.lower():
                             try:
                                 async with session.get(link, timeout=0.8) as test_response:
